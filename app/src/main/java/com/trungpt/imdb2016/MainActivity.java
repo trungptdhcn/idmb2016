@@ -1,9 +1,12 @@
 package com.trungpt.imdb2016;
 
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,8 +17,10 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
+import butterknife.Bind;
 import com.trungpt.imdb2016.adapter.GridAdapter;
 import com.trungpt.imdb2016.adapter.model.Movie;
+import com.trungpt.imdb2016.base.BaseActivity;
 import com.trungpt.imdb2016.sync.RestfulService;
 import com.trungpt.imdb2016.sync.dto.MovieDTO;
 import com.trungpt.imdb2016.sync.dto.ResponseDTO;
@@ -24,21 +29,28 @@ import com.trungpt.imdb2016.utils.Constant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
 {
     GridAdapter adapter;
+    @Bind(R.id.gridview)
     GridView gridview;
+    @Bind(R.id.fab)
+    FloatingActionButton fab;
+    protected DrawerLayout drawerLayout;
+    protected ActionBarDrawerToggle drawerToggle;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public void setDataToView(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setupNavDrawer();
+        if (drawerToggle != null)
+        {
+            drawerToggle.syncState();
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        gridview = (GridView) findViewById(R.id.gridview);
         fab.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -48,6 +60,7 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
+
         new AsyncTask<List<Movie>, Void, List<Movie>>()
         {
             @Override
@@ -78,31 +91,62 @@ public class MainActivity extends AppCompatActivity
                 gridview.setAdapter(adapter);
             }
         }.execute();
-
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
+    public int getLayout()
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        return R.layout.activity_main;
+    }
+
+    private void setupNavDrawer()
+    {
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawerLayout == null || !isVisibleNav())
+        {
+            return;
+        }
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, getActionBarToolbar(), R.string.drawer_open, R.string.drawer_close)
+        {
+
+            @Override
+            public void onDrawerOpened(View drawerView)
+            {
+                super.onDrawerOpened(drawerView);
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView)
+            {
+                super.onDrawerClosed(drawerView);
+                invalidateOptionsMenu();
+            }
+        };
+
+        drawerToggle.setDrawerIndicatorEnabled(true);
+        drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings)
+        {
+            return false;
+        }
+        if (drawerToggle.onOptionsItemSelected(item))
         {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

@@ -41,7 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected Toolbar getActionBarToolbar() {
         if (toolbar == null) {
-            toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+            toolbar = (Toolbar) findViewById(R.id.toolbar);
             if (toolbar != null) {
                 setSupportActionBar(toolbar);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);

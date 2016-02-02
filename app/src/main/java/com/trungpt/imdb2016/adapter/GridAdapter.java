@@ -66,7 +66,7 @@ public class GridAdapter extends BaseAdapter
             convertView.setTag(holder);
         }
         holder.tvTitle.setText(movie.getTitle());
-        Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
+        Display display = ((Activity) mContext).getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int width = size.x;
@@ -74,7 +74,7 @@ public class GridAdapter extends BaseAdapter
         Glide.with(mContext)
                 .load(movie.getUrlPoster())
                 .centerCrop()
-                .override(width/3,height/4)
+                .override(width / 3, height / 4)
                 .placeholder(R.drawable.thumbnail)
                 .crossFade()
                 .into(holder.ivAvatar);
